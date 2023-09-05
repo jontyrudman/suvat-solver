@@ -50,7 +50,7 @@ def pprint_suvat(suvat: Suvat) -> None:
     print(f"Time = {suvat.t} s")
 
 
-def cli() -> None:
+def main() -> None:
     parser = get_parser()
     args = parser.parse_args()
 
