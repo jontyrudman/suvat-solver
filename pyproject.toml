@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "suvat"
+version = "0.1.0"
+description = ""
+authors = ["Jonathan Rudman <jonathan.rudman@live.co.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
