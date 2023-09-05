@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "suvat"
+name = "suvatsolver"
 version = "0.1.0"
 description = ""
 authors = ["Jonathan Rudman <jonathan.rudman@live.co.uk>"]
