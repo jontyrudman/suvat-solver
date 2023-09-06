@@ -1,18 +1,45 @@
 import math
-from pydantic import validate_call
-from dataclasses import dataclass, asdict
 from typing import Self
 import itertools
 
 
-@validate_call
-@dataclass
 class Suvat:
     s: list[float] | None = None
     u: list[float] | None = None
     v: list[float] | None = None
     a: list[float] | None = None
     t: list[float] | None = None
+
+    def __init__(
+        self,
+        s: float | None = None,
+        u: float | None = None,
+        v: float | None = None,
+        a: float | None = None,
+        t: float | None = None,
+    ):
+        if sum(x is not None for x in [s, u, v, a, t]) < 3:
+            raise Exception("Less than three known values")
+
+        if (
+            a is not None
+            and u is not None
+            and v is not None
+            and ((a > 0 and u > v) or (a < 0 and u < v))
+        ):
+            raise Exception("Acceleration mismatch")
+
+        if t is not None and t <= 0:
+            raise Exception("Time cannot be less than or equal to zero")
+
+        if s != 0 and u == 0 and v == 0:
+            raise Exception("Displacement cannot be non-zero with zero velocity")
+
+        self.s = [float(s)] if s is not None else None
+        self.u = [float(u)] if u is not None else None
+        self.v = [float(v)] if v is not None else None
+        self.a = [float(a)] if a is not None else None
+        self.t = [float(t)] if t is not None else None
 
     def _append_if_unique(self, variable_name: str, *values: float):
         if variable_name not in list("suvat"):
@@ -29,10 +56,7 @@ class Suvat:
                 self.__setattr__(variable_name, [*original_assignment, value])
 
     def unknowns(self) -> list[str]:
-        return [key for key, val in asdict(self).items() if val is None]
-
-    def solvable(self) -> bool:
-        return len(self.unknowns()) <= 2
+        return [key for key, val in vars(self).items() if val is None]
 
     def solve_for_all(self) -> Self:
         return (
@@ -224,7 +248,7 @@ class Suvat:
                 if top == 0 and self.a == 0:
                     self._append_if_unique("t", 1.0)
                     continue
-                self._append_if_unique("t", top / a, -1 * top / a)
+                self._append_if_unique("t", top / a)
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")

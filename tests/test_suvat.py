@@ -1,4 +1,3 @@
-from dataclasses import asdict
 import itertools
 import pytest
 
@@ -7,18 +6,56 @@ from suvatsolver import Suvat
 
 class TestSuvat:
     # Solved suvat equations to test against the Suvat class
-    valid_test_data = [
+    test_data = [
         {
-            "s": [5],
-            "u": [-9.5, 9.5],
-            "v": [10.5, -10.5],
-            "a": [2],
-            "t": [10, -0.5],
+            "inputs": {
+                "s": 5,
+                "u": -9.5,
+                "v": 10.5,
+                "a": 2,
+                "t": 10,
+            },
+            "valid_result": {
+                "s": [5],
+                "u": [-9.5, 9.5],
+                "v": [10.5],
+                "a": [2],
+                "t": [10, 0.5],
+            },
         }
     ]
 
+    def test_constructor(self):
+        """
+        - Ensure that inputs end up as singletons containing floats.
+        - Ensure that an exception is raised when invalid data is provided.
+        """
+        # Check type conversions
+        suvat = Suvat(s=1, u=2, v=3)
+        assert suvat.s is not None and isinstance(suvat.s[0], float)
+        assert vars(suvat) == {"s": [1.0], "u": [2.0], "v": [3.0], "a": None, "t": None}
+
+        # Check exceptions
+        # Too many unknowns
+        with pytest.raises(Exception):
+            suvat = Suvat(s=1)
+
+        # Acceleration mismatch
+        with pytest.raises(Exception):
+            suvat = Suvat(s=1, u=2, v=3, a=-1)
+
+        # Zero/negative time
+        with pytest.raises(Exception):
+            suvat = Suvat(s=1, u=2, v=3, t=0)
+        with pytest.raises(Exception):
+            suvat = Suvat(s=1, u=2, v=3, t=-0)
+
+        # Non-zero disp with zero vel
+        with pytest.raises(Exception):
+            suvat = Suvat(s=1, u=0, v=0)
+
     def test__append_if_unique(self):
-        suvat = Suvat()
+        suvat = Suvat(u=1, v=1, a=1)
         assert suvat.s is None
         suvat._append_if_unique("s", 1)
         assert suvat.s == [1]
@@ -37,38 +74,23 @@ class TestSuvat:
             for i in range(5):
                 given_variables = c[:i]
                 unknown_variables = c[i:]
-                suvat = Suvat(
-                    **{k: self.valid_test_data[0][k] for k in given_variables}
-                )
-                assert set(suvat.unknowns()) == set(unknown_variables)
-
-
-    def test_solvable(self):
-        for i in range(5):
-            combos = itertools.combinations("suvat", i)
-            for c in combos:
-                given_variables = c[:i]
-                suvat = Suvat(
-                    **{k: self.valid_test_data[0][k] for k in given_variables}
-                )
-
-                # Not enough knowns
                 if (i < 3):
-                    assert suvat.solvable() == False
+                    with pytest.raises(Exception):
+                        suvat = Suvat(
+                            **{k: self.test_data[0]["inputs"][k] for k in given_variables}
+                        )
                 else:
-                    assert suvat.solvable() == True
-
+                    suvat = Suvat(
+                        **{k: self.test_data[0]["inputs"][k] for k in given_variables}
+                    )
+                    assert set(suvat.unknowns()) == set(unknown_variables)
 
     def test_solve_for_all(self):
         combos = itertools.combinations("suvat", 3)
-        expected = self.valid_test_data[0]
+        expected = self.test_data[0]["valid_result"]
         for c in combos:
-            suvat = Suvat(
-                **{k: [expected[k][0]] for k in c}
-            )
+            suvat = Suvat(**{k: self.test_data[0]["inputs"][k] for k in c})
             suvat.solve_for_all()
-            print(c, asdict(suvat))
             for key in expected:
-                solved = asdict(suvat)
-                for possibility_index in range(len(solved[key])):
-                    assert solved[key][possibility_index] == expected[key][possibility_index]
+                solved = vars(suvat)
+                assert set(solved[key]).issubset(set(expected[key]))

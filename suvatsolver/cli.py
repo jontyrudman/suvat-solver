@@ -59,11 +59,11 @@ def main() -> None:
         parser.error("At least three values must be provided for the solver to work.")
 
     solved_suvat = Suvat(
-        s=[float(args.displacement)] if args.displacement is not None else None,
-        u=[float(args.initial_velocity)] if args.initial_velocity is not None else None,
-        v=[float(args.final_velocity)] if args.final_velocity is not None else None,
-        a=[float(args.acceleration)] if args.acceleration is not None else None,
-        t=[float(args.time)] if args.time is not None else None,
+        s=args.displacement,
+        u=args.initial_velocity,
+        v=args.final_velocity,
+        a=args.acceleration,
+        t=args.time,
     ).solve_for_all()
 
     print("Solved!\n")
