@@ -14,6 +14,20 @@ class Suvat:
     a: list[float] | None = None
     t: list[float] | None = None
 
+    def _append_if_unique(self, variable_name: str, *values: float):
+        if variable_name not in list("suvat"):
+            raise ValueError("variable_name must be one of the suvat chars!")
+
+        for value in values:
+            original_assignment = self.__getattribute__(variable_name)
+            if original_assignment is None:
+                self.__setattr__(variable_name, [value])
+            elif (
+                isinstance(original_assignment, list)
+                and value not in original_assignment
+            ):
+                self.__setattr__(variable_name, [*original_assignment, value])
+
     def unknowns(self) -> list[str]:
         return [key for key, val in asdict(self).items() if val is None]
 
@@ -35,34 +49,26 @@ class Suvat:
 
         # Given u, a, t
         if self.u is not None and self.a is not None and self.t is not None:
-            self.s = [
-                (u * t) + (0.5 * a * (t**2))
-                for u, a, t in itertools.product(self.u, self.a, self.t)
-            ]
+            for u, a, t in itertools.product(self.u, self.a, self.t):
+                self._append_if_unique("s", (u * t) + (0.5 * a * (t**2)))
             return self
 
         # Given u, v, t
         if self.u is not None and self.v is not None and self.t is not None:
-            self.s = [
-                0.5 * t * (u + v)
-                for u, v, t in itertools.product(self.u, self.v, self.t)
-            ]
+            for u, v, t in itertools.product(self.u, self.v, self.t):
+                self._append_if_unique("s", 0.5 * t * (u + v))
             return self
 
         # Given v, a, t
         if self.v is not None and self.a is not None and self.t is not None:
-            self.s = [
-                (v * t) - (0.5 * a * (t**2))
-                for v, a, t in itertools.product(self.v, self.a, self.t)
-            ]
+            for v, a, t in itertools.product(self.v, self.a, self.t):
+                self._append_if_unique("s", (v * t) - (0.5 * a * (t**2)))
             return self
 
         # Given u, v, a
         if self.u is not None and self.v is not None and self.a is not None:
-            self.s = [
-                ((v**2) - (u**2)) / (2.0 * a)
-                for u, v, a in itertools.product(self.u, self.v, self.a)
-            ]
+            for u, v, a in itertools.product(self.u, self.v, self.a):
+                self._append_if_unique("s", ((v**2) - (u**2)) / (2.0 * a))
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
@@ -77,35 +83,28 @@ class Suvat:
 
         # Given v, a, t
         if self.v is not None and self.a is not None and self.t is not None:
-            self.u = [
-                v - (a * t) for v, a, t in itertools.product(self.v, self.a, self.t)
-            ]
+            for v, a, t in itertools.product(self.v, self.a, self.t):
+                self._append_if_unique("u", v - (a * t))
             return self
 
         # Given s, v, t
         if self.s is not None and self.v is not None and self.t is not None:
-            self.u = [
-                ((2.0 * s) / t) - v
-                for s, v, t in itertools.product(self.s, self.v, self.t)
-            ]
+            for s, v, t in itertools.product(self.s, self.v, self.t):
+                self._append_if_unique("u", ((2.0 * s) / t) - v)
             return self
 
         # Given s, v, a, no certainty when dealing with negatives
         if self.s is not None and self.v is not None and self.a is not None:
-            self.u = []
             for s, v, a in itertools.product(self.s, self.v, self.a):
-                self.u += [
-                    math.sqrt((v**2) - 2.0 * a * s),
+                self._append_if_unique("u", math.sqrt((v**2) - 2.0 * a * s),
                     -1 * math.sqrt((v**2) - 2.0 * a * s),
-                ]
+)
             return self
 
         # Given s, a, t
         if self.s is not None and self.a is not None and self.t is not None:
-            self.u = [
-                (s / t) - 0.5 * a * t
-                for s, a, t in itertools.product(self.s, self.a, self.t)
-            ]
+            for s, a, t in itertools.product(self.s, self.a, self.t):
+                self._append_if_unique("u", (s / t) - 0.5 * a * t)
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
@@ -120,35 +119,30 @@ class Suvat:
 
         # Given u, a, t
         if self.u is not None and self.a is not None and self.t is not None:
-            self.v = [
-                u + (a * t) for u, a, t in itertools.product(self.u, self.a, self.t)
-            ]
+            for u, a, t in itertools.product(self.u, self.a, self.t):
+                self._append_if_unique("v", u + (a * t))
             return self
 
         # Given s, u, a
         if self.s is not None and self.u is not None and self.a is not None:
-            self.v = []
             for s, u, a in itertools.product(self.s, self.u, self.a):
-                self.v += [
+                self._append_if_unique(
+                    "v",
                     math.sqrt((u**2) + (2 * a * s)),
                     -1 * math.sqrt((u**2) + (2 * a * s)),
-                ]
+                )
             return self
 
         # Given s, a, t
         if self.s is not None and self.a is not None and self.t is not None:
-            self.v = [
-                (s / t) + (0.5 * a * t)
-                for s, a, t in itertools.product(self.s, self.a, self.t)
-            ]
+            for s, a, t in itertools.product(self.s, self.a, self.t):
+                self._append_if_unique("v", (s / t) + (0.5 * a * t))
             return self
 
         # Given s, u, t
         if self.s is not None and self.u is not None and self.t is not None:
-            self.v = [
-                ((2 * s) / t) - u
-                for s, u, t in itertools.product(self.s, self.u, self.t)
-            ]
+            for s, u, t in itertools.product(self.s, self.u, self.t):
+                self._append_if_unique("v", ((2 * s) / t) - u)
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
@@ -163,33 +157,26 @@ class Suvat:
 
         # Given u, v, t
         if self.u is not None and self.v is not None and self.t is not None:
-            self.a = [
-                (v - u) / t for u, v, t in itertools.product(self.u, self.v, self.t)
-            ]
+            for u, v, t in itertools.product(self.u, self.v, self.t):
+                self._append_if_unique("a", (v - u) / t)
             return self
 
         # Given s, u, v
         if self.s is not None and self.u is not None and self.v is not None:
-            self.a = [
-                ((v**2) - (u**2)) / (2.0 * s)
-                for s, u, v in itertools.product(self.s, self.u, self.v)
-            ]
+            for s, u, v in itertools.product(self.s, self.u, self.v):
+                self._append_if_unique("a", ((v**2) - (u**2)) / (2.0 * s))
             return self
 
         # Given s, u, t
         if self.s is not None and self.u is not None and self.t is not None:
-            self.a = [
-                (2.0 * (s - (u * t))) / (t**2)
-                for s, u, t in itertools.product(self.s, self.u, self.t)
-            ]
+            for s, u, t in itertools.product(self.s, self.u, self.t):
+                self._append_if_unique("a", (2.0 * (s - (u * t))) / (t**2))
             return self
 
         # Given s, v, t
         if self.s is not None and self.v is not None and self.t is not None:
-            self.a = [
-                (2.0 * ((v * t) - s)) / (t**2)
-                for s, v, t in itertools.product(self.s, self.v, self.t)
-            ]
+            for s, v, t in itertools.product(self.s, self.v, self.t):
+                self._append_if_unique("a", (2.0 * ((v * t) - s)) / (t**2))
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
@@ -200,28 +187,23 @@ class Suvat:
 
         # Given s, u, v
         if self.s is not None and self.u is not None and self.v is not None:
-            self.t = [
-                (2.0 * s) / (u + v)
-                for s, u, v in itertools.product(self.s, self.u, self.v)
-            ]
+            for s, u, v in itertools.product(self.s, self.u, self.v):
+                self._append_if_unique("t", (2.0 * s) / (u + v))
             return self
 
         # Given s, u, a
         if self.s is not None and self.u is not None and self.a is not None:
-            self.t = [
-                u / (s - (0.5 * a))
-                for s, u, a in itertools.product(self.s, self.u, self.a)
-            ]
+            for s, u, a in itertools.product(self.s, self.u, self.a):
+                self._append_if_unique("t", u / (s - (0.5 * a)))
             return self
 
         # Given u, v, a
         if self.u is not None and self.v is not None and self.a is not None:
-            self.t = []
             for u, v, a in itertools.product(self.u, self.v, self.a):
                 if v - u == 0 and a == 0:
-                    self.t += [1.0]
-                    return self
-                self.t += [(v - u) / a]
+                    self._append_if_unique("t", 1.0)
+                    continue
+                self._append_if_unique("t", (v - u) / a)
             return self
 
         # Given s, v, a, the u generated in the formula will be positive
@@ -230,9 +212,9 @@ class Suvat:
             for s, v, a in itertools.product(self.s, self.v, self.a):
                 top = v - math.sqrt((v**2) - (2.0 * a * s))
                 if top == 0 and self.a == 0:
-                    self.t += [1.0]
-                    return self
-                self.t += [top / a, -1 * top / a]
+                    self._append_if_unique("t", 1.0)
+                    continue
+                self._append_if_unique("t", top / a, -1 * top / a)
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
