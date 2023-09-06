@@ -96,9 +96,14 @@ class Suvat:
         # Given s, v, a, no certainty when dealing with negatives
         if self.s is not None and self.v is not None and self.a is not None:
             for s, v, a in itertools.product(self.s, self.v, self.a):
-                self._append_if_unique("u", math.sqrt((v**2) - 2.0 * a * s),
-                    -1 * math.sqrt((v**2) - 2.0 * a * s),
-)
+                res = math.sqrt((v**2) - 2.0 * a * s)
+
+                # Pick the u greater than v if a is negative
+                if (a < 0 and res > v) or (a > 0 and res < v):
+                    self._append_if_unique("u", res)
+                if (a < 0 and -1 * res > v) or (a > 0 and -1 * res < v):
+                    self._append_if_unique("u", -1 * res)
+
             return self
 
         # Given s, a, t
@@ -126,11 +131,16 @@ class Suvat:
         # Given s, u, a
         if self.s is not None and self.u is not None and self.a is not None:
             for s, u, a in itertools.product(self.s, self.u, self.a):
-                self._append_if_unique(
-                    "v",
-                    math.sqrt((u**2) + (2 * a * s)),
-                    -1 * math.sqrt((u**2) + (2 * a * s)),
-                )
+                res = math.sqrt((u**2) + (2 * a * s))
+
+                # Pick the v (maybe multiple) greater than u if a is positive
+                if (a > 0 and res > u) or (a < 0 and res < u):
+                    self._append_if_unique("v", res)
+
+                # Give the negative version if also applicable, due to uncertainty
+                if (a > 0 and -1 * res > u) or (a < 0 and -1 * res < u):
+                    self._append_if_unique("v", -1 * res)
+
             return self
 
         # Given s, a, t
