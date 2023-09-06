@@ -79,7 +79,7 @@ class Suvat:
 
         # Given s, a, t
         if self.s is not None and self.a is not None and self.t is not None:
-            self.u = (self.s * self.t) - 0.5 * self.a * self.t
+            self.u = (self.s / self.t) - 0.5 * self.a * self.t
             return self
 
         raise Exception("Cannot be solved with more than two unknowns!")
@@ -104,7 +104,7 @@ class Suvat:
 
         # Given s, a, t
         if self.s is not None and self.a is not None and self.t is not None:
-            self.v = (self.s * self.t) + (0.5 * self.a * self.t)
+            self.v = (self.s / self.t) + (0.5 * self.a * self.t)
             return self
 
         # Given s, u, t
