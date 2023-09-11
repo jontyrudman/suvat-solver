@@ -6,14 +6,23 @@ from . import Suvat, componentise_2d, componentise_3d
 def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="SUVAT Solver",
-        description="Solve SUVAT equations. Requires at least three known values.",
+        description=(
+            "Solve SUVAT equations to model projectile motion.\n\n"
+            "Requires at least three known values.\n"
+            "Defaults to one dimension, use -d to specify up to three dimensions.\n"
+            "When using more than one dimension, use --angle to specify the\n"
+            "direction of the projectile (one angle for 2D, two angles for 3D).\n"
+            "Alternatively, provide an extra component of each known SUVAT value\n"
+            "(e.g. when using 3D, provide three values for -s)."
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
-    # TODO: Max 3
     parser.add_argument(
         "-d",
         "--dimensions",
         choices=range(1, 4),
+        default=1,
         type=int,
         help="number of dimensions to calculate suvat for",
     )
@@ -62,18 +71,18 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def pretty_format_uncertain_values(l: list | None) -> str:
+    """
+    Formats a list of values as a str, separated by " or ".
+    """
     if l is None:
         return "None"
-
-    out = ""
-    for i, item in enumerate(l):
-        if i > 0:
-            out += " or "
-        out += str(item)
-    return out
+    return " or ".join([str(x) for x in l])
 
 
 def pprint_suvat(suvat: Suvat) -> None:
+    """
+    Pretty-prints the values from a Suvat object.
+    """
     print(f"  Displacement = {pretty_format_uncertain_values(suvat.s)} m")
     print(f"  Initial velocity = {pretty_format_uncertain_values(suvat.u)} m/s")
     print(f"  Final velocity = {pretty_format_uncertain_values(suvat.v)} m/s")
