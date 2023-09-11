@@ -4,15 +4,18 @@ Use to solve SUVAT equations to model projectile motion.
 
 ## Installation
 
+Go to the [releases page](https://github.com/jontyrudman/suvatsolver/releases) and not the latest version.
+Replace `{VERSION}` in the following command with the latest version.
+
 If you have `wheel` installed:
 
 ```
-pip install https://github.com/jontyrudman/suvatsolver/releases/latest/download/suvatsolver-py3-none-any.whl
+pip install https://github.com/jontyrudman/suvatsolver/releases/download/{VERSION}/suvatsolver-{VERSION}-py3-none-any.whl
 ```
 
 If you don't want to install `wheel`:
 ```
-pip install https://github.com/jontyrudman/suvatsolver/releases/latest/download/suvatsolver.tar.gz
+pip install https://github.com/jontyrudman/suvatsolver/releases/download/{VERSION}/suvatsolver-{VERSION}.tar.gz
 ```
 
 ## Usage
